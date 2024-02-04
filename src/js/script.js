@@ -82,6 +82,8 @@
       thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
       thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
       thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+      thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);
+      // console.log('thisProduct.imageWrapper',thisProduct.imageWrapper)
     }
     initAccordion() {
       const thisProduct = this;
@@ -137,25 +139,40 @@
       for (let paramId in thisProduct.data.params) {
         // determine param value, e.g. paramId = 'toppings', param = { label: 'Toppings', type: 'checkboxes'... }
         const param = thisProduct.data.params[paramId];
-        console.log(paramId, param);
+        // console.log('1. paramId',paramId,'param', param);
 
         // for every option in this category
         for (let optionId in param.options) {
           // determine option value, e.g. optionId = 'olives', option = { label: 'Olives', price: 2, default: true }
           const option = param.options[optionId];
-          console.log(optionId, option);
+          // console.log('2. optionId', optionId, 'option', option);
 
+          // find all classes for each product image
+          const imageClass = thisProduct.imageWrapper.querySelector(`.${paramId}-${optionId}`);
+
+          // change price
           if (formData[paramId].includes(optionId)) {
-            // include - optionId and it is not default
+            // include 
+            // - optionId and it is not default
             if (!option.default) {
               price += option.price;
             }
+            // - img - if exist then add class active
+            if (imageClass) {
+              imageClass.classList.add(classNames.menuProduct.imageVisible);
+            }
           } else {
-            // not include - optionId and it is default
+            // not include 
+            //  - optionId and it is default
             if (option.default) {
               price -= option.price;
             }
+            // - image - remove class active
+            if (imageClass) {
+              imageClass.classList.remove(classNames.menuProduct.imageVisible);
+            }
           }
+
         }
       }
 
