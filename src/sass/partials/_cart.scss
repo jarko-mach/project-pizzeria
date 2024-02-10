@@ -73,7 +73,8 @@
 
   }
 
-  &__product { // CODE CHANGED
+  &__product {
+    // CODE CHANGED
     width: 170px; // CODE CHANGED
   }
 
@@ -106,7 +107,23 @@
       position: absolute;
       content: ':';
     }
+  }
 
+  &__product-icon {
+    font-size: ($base-size*1.2);
+    color: $color-main;
+    margin-left: 10px;
+  }
+
+  &__product-number {
+    // background: $color-main;
+    border: 2px solid black;
+    width: 25px;
+    height: 25px;
+    border-radius: 20%;
+    margin-right: 15px;
+    text-align: center;
+    line-height: 22px;
   }
 
   // CODE ADDED END
@@ -149,7 +166,8 @@
     border-top: 1px solid lighten($color-dark, 70%);
     padding: $base-size 0 0 0;
 
-    input, button {
+    input,
+    button {
       width: 100%;
       margin-bottom: ($base-size / 2);
     }

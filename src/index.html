@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Pizzeria</title>
-  <link href="https://fonts.googleapis.com/css?family=Lato:400,300i,700%7COswald:300,500,700&amp;subset=latin-ext" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,300i,700%7COswald:300,500,700&amp;subset=latin-ext"
+    rel="stylesheet">
   <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
 
+<body>
   <header class="header">
     <div class="container">
       <div class="header__wrapper">
@@ -55,9 +57,9 @@
     </div>
   </header>
 
-    <div id="product-list" class="product-list container"></div>
+  <div id="product-list" class="product-list container"></div>
 
-    <script id="template-menu-product" type="text/x-handlebars-template">
+  <script id="template-menu-product" type="text/x-handlebars-template">
       <article class="product"> <!-- product -->
 
           <header class="product__header">
@@ -136,9 +138,41 @@
       </article> <!-- .product -->
     </script>
 
+  <script id="template-cart-list" type="text/x-handlebars-template">
+    <div class="cart__product-header">
+      <div  class="cart__product-header">
+        <!-- display number of meals -->
+          <span class="cart__product-number">{{amount}}</span>
+      </div>
+      
+      <div class="cart__product-details">
+        <!-- display the name of the dish -->
+          <div class="cart__product-header"> 
+            <strong>{{name}}</strong>
+            <strong>${{price}}</strong>
+          </div>
+          <!-- display the ingredients of the dish -->
+          {{#each params}}
+            <li id="{{ @key }}">
+               <span  class="cart__product-details-label"> {{label}}</span>
+              {{#each options}}
+                <span>{{ @key }}, </span>
+              {{/each}}
+            </li>
+          {{/each}}
+      </div>
+
+      <div  class="cart__product-header">
+        <!-- show pencil and trash -->
+        <a href="#"> <i class="fas fa-pencil-alt cart__product-icon"></i></a>
+        <a href="#"> <i class="fas fa-trash-alt cart__product-icon"></i></a>
+      </div>
+    </script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.min.js"></script>
   <script src="js/functions.js"></script>
   <script src="js/data.js"></script>
   <script src="js/script.js"></script>
 </body>
+
 </html>

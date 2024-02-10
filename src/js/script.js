@@ -6,6 +6,7 @@
   const select = {
     templateOf: {
       menuProduct: "#template-menu-product",
+      cartList: '#template-cart-list'
     },
     containerOf: {
       menu: '#product-list',
@@ -33,6 +34,7 @@
     },
     cart: {
       toggleTrigger: '.fa-chevron-down',
+      summary: '.cart__order-summary',
     }
   };
 
@@ -56,6 +58,7 @@
 
   const templates = {
     menuProduct: Handlebars.compile(document.querySelector(select.templateOf.menuProduct).innerHTML),
+    cartList: Handlebars.compile(document.querySelector(select.templateOf.cartList).innerHTML),
   };
 
   class Product {
@@ -130,6 +133,7 @@
       thisProduct.cartButton.addEventListener('click', function (event) {
         event.preventDefault();
         thisProduct.processOrder();
+        thisProduct.addToCart();
       });
     }
     processOrder() {
@@ -180,8 +184,10 @@
         }
       }
       // multiple price by amount
+      thisProduct.priceSingle = price;
       price *= thisProduct.amountWidget.value;
       // update calculated price in the HTML
+      thisProduct.price = price;
       thisProduct.priceElem.innerHTML = price;
     }
     initAmountWidget() {
@@ -190,6 +196,81 @@
       thisProduct.amountWidgetElem.addEventListener('updated', function () {
         thisProduct.processOrder();
       });
+    }
+    addToCart() {
+      const thisProduct = this;
+      // app.cart.add(thisProduct);
+      app.cart.add(thisProduct.prepareCartProduct());
+    }
+    prepareCartProduct() {
+      const thisProduct = this;
+      const productSummary = {};
+      productSummary.id = thisProduct.id;
+      productSummary.name = thisProduct.data.name;
+      productSummary.amount = thisProduct.amountWidget.input.value;
+      productSummary.priceSingle = thisProduct.priceSingle;
+      productSummary.price = thisProduct.price;
+      productSummary.params = thisProduct.prepareCartProductParams();
+      return productSummary;
+    }
+    prepareCartProductParams() {
+      const thisProduct = this;
+      const cartProductParams = {};
+      let price = 0;
+      // convert form to object structure e.g. { sauce: ['tomato'], toppings: ['olives', 'redPeppers']}
+      const formData = utils.serializeFormToObject(thisProduct.form);
+
+      for (let paramId in thisProduct.data.params) {
+        // determine param value, e.g. paramId = 'toppings', param = { label: 'Toppings', type: 'checkboxes'... }
+        const param = thisProduct.data.params[paramId];
+
+        // create object cartProductParams
+        cartProductParams[paramId] = {};
+
+        // add 'label' into cartProductParams
+        cartProductParams[paramId].label = param.label;
+
+        // create options
+        cartProductParams[paramId].options = {};
+
+        // for every option in this category
+        for (let optionId in param.options) {
+
+          // determine option value, e.g. optionId = 'olives', option = { label: 'Olives', price: 2, default: true }
+          const option = param.options[optionId];
+
+          // find all classes for each product image
+          const imageClass = thisProduct.imageWrapper.querySelector(`.${paramId}-${optionId}`);
+
+          // change price
+          if (formData[paramId].includes(optionId)) {
+            // include 
+            // - optionId and it is not default
+            if (!option.default) {
+              price += option.price;
+            }
+            // - img - if exist then add class 'active'
+            if (imageClass) {
+              imageClass.classList.add(classNames.menuProduct.imageVisible);
+            }
+            // add existing options into cartProductParams
+            cartProductParams[paramId].options[optionId] = option.label;
+
+          } else {
+            // not include 
+            //  - optionId and it is default
+            if (option.default) {
+              price -= option.price;
+            }
+            // - image - remove class active
+            if (imageClass) {
+              imageClass.classList.remove(classNames.menuProduct.imageVisible);
+            }
+          }
+
+        }
+      }
+      return cartProductParams;
     }
   }
 
@@ -248,7 +329,6 @@
       const thisCart = this;
       thisCart.products = [];
       thisCart.getElements(element);
-      console.log('new Cart', thisCart);
     }
 
     getElements(element) {
@@ -256,15 +336,27 @@
       thisCart.dom = {};
       thisCart.dom.wrapper = element;
       thisCart.dom.toggleTrigger = thisCart.dom.wrapper.querySelector(select.cart.toggleTrigger);
-      thisCart.initActions()
+      thisCart.initActions();
+      thisCart.dom.productList = document.querySelector(select.cart.summary)
     }
 
     initActions() {
       const thisCart = this;
-      thisCart.dom.toggleTrigger.addEventListener('click', function(event){
+      thisCart.dom.toggleTrigger.addEventListener('click', function (event) {
         event.preventDefault();
         thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);
       })
+    }
+
+    add(menuProduct) {
+      const thisCart = this;
+      
+      // generate HTML
+      const generatedHTML = templates.cartList(menuProduct);
+      // create DOM element
+      const generatedDOMHtml = utils.createDOMFromHTML(generatedHTML);
+      // add DOM element to cart
+      thisCart.dom.productList.appendChild(generatedDOMHtml);
     }
   }
 
@@ -274,7 +366,6 @@
       for (let productData in thisApp.data.products) {
         new Product(productData, thisApp.data.products[productData]);
       }
-      // const testProduct = new Product();
     },
     initData: function () {
       const thisApp = this;
@@ -282,11 +373,6 @@
     },
     init: function () {
       const thisApp = this;
-      console.log('*** App starting ***');
-      // console.log('thisApp:', thisApp);
-      // console.log('classNames:', classNames);
-      console.log('settings:', settings);
-      console.log('templates:', templates);
       thisApp.initData();
       thisApp.initMenu();
       thisApp.initCart();
