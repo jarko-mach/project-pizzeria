@@ -216,6 +216,7 @@
     prepareCartProductParams() {
       const thisProduct = this;
       const cartProductParams = {};
+      /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "price" }]*/
       let price = 0;
       // convert form to object structure e.g. { sauce: ['tomato'], toppings: ['olives', 'redPeppers']}
       const formData = utils.serializeFormToObject(thisProduct.form);
