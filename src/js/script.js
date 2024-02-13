@@ -104,7 +104,7 @@
       /* START: add event listener to clickable trigger on event click */
       thisProduct.accordionTrigger.addEventListener('click', function (event) {
         /* prevent default action for event */
-        event.preventDefault;
+        event.preventDefault();
         /* find active product (product that has active class) */
         const activeProducts = document.querySelectorAll('.product.active');
         /* if there is active product and it's not thisProduct.dom.element, remove class active from it */
@@ -204,20 +204,39 @@
     }
     prepareCartProduct() {
       const thisProduct = this;
-      const productSummary = {};
-      productSummary.id = thisProduct.id;
-      productSummary.name = thisProduct.data.name;
-      productSummary.amount = thisProduct.amountWidget.input.value;
-      productSummary.priceSingle = thisProduct.priceSingle;
-      productSummary.price = thisProduct.price;
-      productSummary.params = thisProduct.prepareCartProductParams();
-      return productSummary;
+      // corrected as in version ONE
+            // const productSummary = {
+            //   id: thisProduct.id,
+            //   name: thisProduct.data.name,
+            //   amount: thisProduct.amountWidget.input.value,
+            //   priceSingle: thisProduct.priceSingle,
+            //   price: thisProduct.price,
+            //   params: thisProduct.prepareCartProductParams(),
+            // };
+
+      // corrected as in version TWO
+      const { id, data: { name }, amountWidget: { input }, priceSingle, price, prepareCartProductParams} = thisProduct;
+      
+      // corrected as in version ONE
+            // return productSummary;
+      
+      // corrected as in version TWO
+      return {
+        id,
+        name,
+        amount: input.value,
+        priceSingle,
+        price,
+        params: prepareCartProductParams(),
+      }
     }
+
     prepareCartProductParams() {
       const thisProduct = this;
       const cartProductParams = {};
       /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "price" }]*/
       let price = 0;
+      
       // convert form to object structure e.g. { sauce: ['tomato'], toppings: ['olives', 'redPeppers']}
       const formData = utils.serializeFormToObject(thisProduct.form);
 
@@ -351,7 +370,7 @@
 
     add(menuProduct) {
       const thisCart = this;
-      
+
       // generate HTML
       const generatedHTML = templates.cartList(menuProduct);
       // create DOM element
